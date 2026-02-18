@@ -1,0 +1,295 @@
+generator client {
+  provider        = "prisma-client"
+  output          = "../src/generated/prisma"
+  moduleFormat    = "cjs"
+}
+
+datasource db {
+  provider = "mysql"
+  relationMode = "prisma"
+}
+
+model cadastro_de_equipamentos {
+  ID                                  Int                                  @id @default(autoincrement())
+  tag_vinculada                       Int?
+  ID_cliente                          Int?
+  ID_filial                           Int?
+  id_centro_custo                     Int?
+  ID_predios                          Int?
+  ID_setores                          Int?
+  ID_departamentos                    Int?
+  ID_familia                          Int?                                 @default(0)
+  id_categoria                        Int?
+  ID_tipoeqto                         Int?
+  centro_custo                        String?                              @db.VarChar(45)
+  equipamento_codigo                  String?                              @db.VarChar(45)
+  n_patrimonio                        String?                              @db.VarChar(45)
+  descricao                           String?                              @db.VarChar(200)
+  ficha_tecnica                       String?                              @db.Text
+  familia                             String?                              @db.VarChar(45)
+  tipo_equipamento                    String?                              @db.VarChar(45)
+  localizacao                         String?                              @default("") @db.VarChar(200)
+  id_localizacao                      Int?
+  predio                              String?                              @default("") @db.VarChar(45)
+  setor                               String?                              @default("") @db.VarChar(45)
+  fabricante                          String?                              @db.VarChar(45)
+  marca                               String?                              @db.VarChar(45)
+  n_serie                             String?                              @db.VarChar(45)
+  modelo                              String?                              @db.VarChar(500)
+  ano_fabricacao                      DateTime?                            @db.Date
+  ano_modelo                          DateTime?                            @db.Date
+  garantia                            String?                              @db.VarChar(45)
+  data_compra                         DateTime?                            @db.Date
+  n_nota_fiscal                       String?                              @db.VarChar(45)
+  valor_aquisicao                     Decimal?                             @db.Decimal(10, 2)
+  carga_h_trabalho                    Decimal                              @default(24.00) @db.Decimal(10, 2)
+  InicioFuncionamento                 DateTime?                            @default(dbgenerated("'00:00:00'")) @db.Time(0)
+  TerminoFuncionamento                DateTime?                            @default(dbgenerated("'23:59:59'")) @db.Time(0)
+  custo_hora                          String?                              @db.VarChar(45)
+  observacoes                         String?                              @db.VarChar(600)
+  status_equipamento                  String                               @default("Ativo") @db.VarChar(45)
+  status_cronograma                   String                               @default("Cadastrado") @db.VarChar(45)
+  log_user                            String?                              @db.VarChar(45)
+  log_date                            DateTime                             @default(now()) @db.Timestamp(0)
+  tipo_os_plano                       Int                                  @default(0)
+  tipo_emissao_os                     Int?                                 @default(0)
+  chassi                              String?                              @db.VarChar(45)
+  placa                               String?                              @db.VarChar(45)
+  cor                                 String?                              @db.VarChar(45)
+  n_ct_finame                         String?                              @db.Char(50)
+  beneficiario                        String?                              @db.VarChar(100)
+  codigo_renavam                      String?                              @db.VarChar(45)
+  numero_crv                          String?                              @db.VarChar(45)
+  data_emisao_crv                     DateTime?                            @db.Date
+  licenciamento                       String?                              @db.VarChar(45)
+  apolice_seguro                      String?                              @db.VarChar(45)
+  vencimento_apolice_seguro           DateTime?                            @db.Date
+  tipo_fluido                         String?                              @db.VarChar(45)
+  quantidade_fluido                   Float?
+  imagem                              Bytes?
+  status_funcionamento                Int                                  @default(1)
+  classificacao                       Int?
+  criticidade                         Int?
+  aux                                 String?                              @db.VarChar(255)
+  contador_abastecimento              Int?                                 @default(0)
+  consumo_previsto                    Decimal?                             @default(0.00) @db.Decimal(10, 2)
+  tipo_consumo                        String?                              @db.VarChar(45)
+  id_unidade_medida                   Int?
+  limite_dia_unidade_medida           Int?
+  proprietario                        String?                              @db.VarChar(255)
+  frota                               String?                              @db.VarChar(45)
+  contador_arla                       Int?                                 @default(0)
+  tempo_sincronizacao                 Int?                                 @default(30)
+  departamento                        String?                              @db.VarChar(45)
+  id_aux                              Int?
+  cadastro_de_familias_de_equipamento cadastro_de_familias_de_equipamento? @relation(fields: [ID_familia], references: [ID], onDelete: NoAction, map: "fk_familia_equipamento")
+  controle_de_ordens_de_servico       controle_de_ordens_de_servico[]
+  sofman_apontamento_paradas          sofman_apontamento_paradas[]
+
+  @@index([criticidade], map: "criticidade")
+  @@index([id_unidade_medida], map: "fk_cad_equipamentos_unidade_medida_id")
+  @@index([id_categoria], map: "fk_equipamento_categoria_id")
+  @@index([id_centro_custo], map: "fk_equipamentos_cc_idx")
+  @@index([ID_cliente], map: "fk_equipamentos_cliente_idx")
+  @@index([ID_departamentos], map: "fk_equipamentos_departamento_idx")
+  @@index([ID_familia], map: "fk_equipamentos_familia_idx")
+  @@index([ID_filial], map: "fk_equipamentos_filial_idx")
+  @@index([ID_predios], map: "fk_equipamentos_predio_idx")
+  @@index([ID_setores], map: "fk_equipamentos_setores_idx")
+  @@index([ID_tipoeqto], map: "fk_equipamentos_tipoeqto_idx")
+  @@index([equipamento_codigo], map: "idx_equipamento_codigo")
+  @@index([tag_vinculada], map: "idx_tag_vinculada")
+  @@index([equipamento_codigo, descricao], map: "indexequipamento")
+}
+
+model cadastro_de_familias_de_equipamento {
+  ID                       Int                        @id @default(autoincrement())
+  ID_cliente               Int?
+  ID_filial                Int?
+  familia                  String?                    @db.VarChar(45)
+  observacoes              String?                    @db.VarChar(100)
+  log_user                 String?                    @db.VarChar(45)
+  log_date                 DateTime                   @default(now()) @db.Timestamp(0)
+  imagem                   String?                    @db.VarChar(255)
+  id_aux                   Int?
+  cadastro_de_equipamentos cadastro_de_equipamentos[]
+
+  @@unique([ID_cliente, familia], map: "unique_familia_cliente")
+  @@index([ID_filial], map: "fk_familiaeqto_filial_idx")
+  @@index([ID_cliente], map: "fk_familiaeqtu_cliente_idx")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model controle_de_ordens_de_servico {
+  ID                                  Int                             @id @default(autoincrement())
+  ordem                               String?                         @db.Char(20)
+  data_hora_solicitacao               DateTime?                       @db.DateTime(0)
+  data_hora_solicitacao_timestamp     BigInt?
+  log_user                            String?                         @db.Char(50)
+  log_date                            DateTime                        @default(now()) @db.Timestamp(0)
+  created_at                          DateTime?                       @default(now()) @db.Timestamp(0)
+  log_date_timestamp                  BigInt?
+  id_ordem_pai                        Int?
+  ID_cliente                          Int?
+  ID_filial                           Int?
+  id_pedido                           Int?
+  id_producao_dados                   Int?
+  id_equipamento                      Int?
+  id_programacao                      Int?
+  id_cronograma                       Int?
+  id_plano_manutencao                 Int?
+  id_planejamento_manutencao          Int?
+  ID_centro_custo                     Int?
+  ID_predio                           Int?
+  ID_setor                            Int?
+  ID_departamento                     Int?
+  ID_familia                          Int?
+  ID_tipo_eqto                        Int?
+  id_localizacao                      Int?
+  ordem_vinculada                     String?                         @db.Char(45)
+  filial                              String?                         @db.VarChar(70)
+  predio                              String?                         @db.VarChar(45)
+  setor                               String?                         @db.VarChar(45)
+  departamento                        String?                         @db.VarChar(45)
+  familia                             String?                         @db.VarChar(45)
+  tipo_equipamento                    String?                         @db.VarChar(45)
+  equipamento                         String?                         @db.VarChar(45)
+  modelo                              String?                         @db.VarChar(45)
+  descricao_solicitacao               String?                         @db.MediumText
+  descricao_servico_realizado         String?                         @db.MediumText
+  observacoes                         String?                         @db.MediumText
+  observacoes_executante              String?                         @db.MediumText
+  tipo_manutencao                     Int?
+  id_tpm_etiqueta                     Int?
+  tpm_numero_etiqueta                 Int?
+  status_os                           Int?
+  retorno_checklist                   String?                         @db.Char(100)
+  fechada                             String?                         @default("N") @db.Char(1)
+  status_equipamento                  String?                         @db.VarChar(45)
+  status_cronograma                   String?                         @db.VarChar(45)
+  status_execucao                     Int?                            @default(0)
+  data_prevista_termino               DateTime?                       @db.DateTime(0)
+  data_inicio                         DateTime?                       @db.DateTime(0)
+  data_hora_encerramento              DateTime?                       @db.DateTime(0)
+  solicitante                         String?                         @db.VarChar(45)
+  emissor                             String?                         @db.VarChar(45)
+  id_subgrupo                         Int?
+  setor_executante                    Int?
+  mantenedores                        String?                         @db.VarChar(500)
+  hh_previsto                         Decimal?                        @default(0.00) @db.Decimal(10, 2)
+  hh_real                             Decimal?                        @default(0.00) @db.Decimal(10, 2)
+  custo_previsto                      Decimal?                        @default(0.00) @db.Decimal(10, 2)
+  custo_horas                         Decimal?                        @default(0.00) @db.Decimal(10, 2)
+  custo_materiais                     Decimal?                        @default(0.00) @db.Decimal(10, 2)
+  custos_lancados                     Decimal?                        @default(0.00) @db.Decimal(10, 2)
+  tempo_maq_parada                    Decimal?                        @default(0.00) @db.Decimal(10, 2)
+  dias_vencimento                     Int?
+  img_vencimento                      String?                         @default("") @db.VarChar(255)
+  localizacao                         String?                         @db.VarChar(200)
+  cod_plano_manutencao                String?                         @default("0") @db.VarChar(30)
+  sessao_id                           String?                         @db.VarChar(132)
+  carga_h_trabalho                    Decimal?                        @default(24.00) @db.Decimal(10, 2)
+  escala_trabalho                     String?                         @db.Char(50)
+  InicioFuncionamento                 DateTime?                       @db.Time(0)
+  TerminoFuncionamento                DateTime?                       @db.Time(0)
+  observacoes_cliente                 String?                         @db.VarChar(600)
+  nota_avalicao_servico               Int?                            @default(0)
+  id_projeto                          Int?                            @default(0)
+  id_plano_acao                       Int?
+  maquina_parada                      Int?                            @default(0)
+  horimetro                           Decimal?                        @db.Decimal(10, 2)
+  hodometro                           Decimal?                        @db.Decimal(10, 2)
+  odometro                            Decimal?                        @db.Decimal(10, 2)
+  count_print                         Int?                            @default(0)
+  prioridade                          Int?
+  classificacao                       Int?
+  data_equipamento_parou              DateTime?                       @db.DateTime(0)
+  data_acionamento_tecnico            DateTime?                       @db.DateTime(0)
+  chegada_tecnico                     DateTime?                       @db.DateTime(0)
+  data_equipamento_funcionou          DateTime?                       @db.DateTime(0)
+  ocorrencia                          String?                         @db.VarChar(45)
+  causa_motivo                        Int?
+  status_falha                        String?                         @db.VarChar(45)
+  servico_pendente                    String?                         @db.VarChar(45)
+  possui_anexo                        String?                         @db.VarChar(45)
+  id_solicitacao_servico              Int?
+  id_registro_producao                Int?
+  aux                                 Int?                            @unique(map: "controle_de_ordens_de_servico_unique")
+  id_solicitante                      Int?
+  id_app                              String?                         @db.VarChar(255)
+  id_apontamento_uso                  Int?
+  cadastro_de_equipamentos            cadastro_de_equipamentos?       @relation(fields: [id_equipamento], references: [ID], onDelete: NoAction, map: "FK_controle_de_ordens_de_servico_cadastro_de_equipamentos")
+  controle_de_ordens_de_servico       controle_de_ordens_de_servico?  @relation("controle_de_ordens_de_servicoTocontrole_de_ordens_de_servico", fields: [id_ordem_pai], references: [ID], onDelete: NoAction, map: "fk_ordem_ordem_filho")
+  other_controle_de_ordens_de_servico controle_de_ordens_de_servico[] @relation("controle_de_ordens_de_servicoTocontrole_de_ordens_de_servico")
+  sofman_apontamento_paradas          sofman_apontamento_paradas[]
+
+  @@unique([ID_filial, id_tpm_etiqueta, tpm_numero_etiqueta], map: "ID_filial")
+  @@index([ID_centro_custo], map: "ID_controledods_cc_idx")
+  @@index([ID_cliente], map: "ID_controledods_cliente_idx")
+  @@index([id_equipamento], map: "ID_controledods_equipamento_idx")
+  @@index([ID_filial], map: "ID_controledods_filial_idx")
+  @@index([classificacao], map: "classificacao")
+  @@index([id_pedido], map: "controle_de_ordens_de_servico_FK")
+  @@index([id_solicitante], map: "controle_de_ordens_de_servico_sofman_cad_solicitantes_FK")
+  @@index([id_apontamento_uso], map: "fk_ordem_apontamento_uso")
+  @@index([causa_motivo], map: "fk_ordem_causa_motivo")
+  @@index([id_ordem_pai], map: "fk_ordem_ordem_filho")
+  @@index([id_registro_producao], map: "fk_ordem_servico_registro_producao")
+  @@index([id_planejamento_manutencao], map: "fk_planejamento_r2")
+  @@index([tipo_manutencao], map: "fk_tipo_manutencao_os")
+  @@index([id_tpm_etiqueta], map: "fk_tmp_etiqueta_ordem_servico")
+  @@index([id_subgrupo], map: "id_subgrupo")
+  @@index([setor_executante], map: "idxSetorExe")
+  @@index([data_hora_encerramento], map: "idx_data_encerramento")
+  @@index([data_hora_solicitacao], map: "idx_data_prog")
+  @@index([fechada], map: "idx_fechada")
+  @@index([id_cronograma], map: "idx_ir_cronograma")
+  @@index([ordem], map: "idx_ordem_servico_ordem")
+  @@index([id_solicitacao_servico], map: "idx_ordem_servico_solicitacao_servico")
+  @@index([prioridade], map: "prioridade")
+  @@index([status_os], map: "status_os")
+}
+
+model sofman_apontamento_paradas {
+  id                            Int                            @id @default(autoincrement())
+  id_ordem_servico              Int?
+  id_setor_executante           Int?
+  id_causa                      Int?
+  id_equipamento                Int?
+  id_lote                       Int?
+  data_hora_stop                DateTime?                      @db.DateTime(0)
+  data_hora_start               DateTime?                      @db.DateTime(0)
+  observacoes                   String?                        @db.VarChar(200)
+  entrada                       Int?                           @default(0)
+  log_user                      String?                        @db.Char(50)
+  log_date                      DateTime?                      @default(now()) @db.Timestamp(0)
+  id_app                        String?                        @db.VarChar(255)
+  aux                           String?                        @db.VarChar(200)
+  cadastro_de_equipamentos      cadastro_de_equipamentos?      @relation(fields: [id_equipamento], references: [ID], onDelete: Cascade, map: "FK_EQUIPAMENTO_PARADAS")
+  controle_de_ordens_de_servico controle_de_ordens_de_servico? @relation(fields: [id_ordem_servico], references: [ID], onDelete: Cascade, map: "FK_ORDEM_PARADAS")
+
+  @@unique([id_ordem_servico, id_equipamento, data_hora_stop, data_hora_start], map: "id_ordem_servico_2")
+  @@index([id_causa], map: "fk_ap_paradas_causa")
+  @@index([id_setor_executante], map: "fk_ap_paradas_setor_executante")
+  @@index([id], map: "id")
+  @@index([id_equipamento], map: "id_equipamento")
+  @@index([id_lote], map: "id_lote")
+  @@index([id_ordem_servico], map: "id_ordem_servico")
+}
+
+model sofman_prospect_escala_trabalho {
+  id              Int       @id @default(autoincrement())
+  id_escala       Int?
+  id_equipamento  Int
+  data_programada DateTime? @db.Date
+  inicio          DateTime? @db.Time(0)
+  termino         DateTime? @db.Time(0)
+  log_user        String?   @db.Char(50)
+  log_date        DateTime? @default(now()) @db.DateTime(0)
+  alterado        Int?      @default(0)
+  id_aux          Int?
+
+  @@index([id_equipamento], map: "fk_escala_prog_equipamento_idx")
+  @@index([id_escala], map: "fk_escala_prog_escala_idx")
+  @@index([data_programada, inicio, termino], map: "sofman_prospect_escala_trabalho")
+}
