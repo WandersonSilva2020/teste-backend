@@ -8,9 +8,12 @@ export class ZodValidationPipe implements PipeTransform {
     try {
       return this.schema.parse(value || {});
     } catch (error) {
-      throw new BadRequestException('Erro de validação nos parâmetros', {
-        cause: error,
-      });
+      throw new BadRequestException(
+        'Um parametro invalido ou um intervalo de datas inválido foi informado',
+        {
+          cause: error,
+        },
+      );
     }
   }
 }
