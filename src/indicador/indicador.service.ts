@@ -2,6 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { ReadIndicatorDTO } from './dto/read-indicator.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { Prisma } from '../generated/prisma/client';
+import dayjs from 'dayjs';
 
 @Injectable()
 export class IndicadorService {
@@ -35,12 +36,6 @@ export class IndicadorService {
       countAtivos: number;
     };
 
-    const timeToMinutes = (time: string | number | Date) => {
-      if (!time) return 0;
-      const d = new Date(time);
-      return d.getUTCHours() * 60 + d.getUTCMinutes();
-    };
-
     try {
       const equipamentos = await this.prisma.$queryRaw<Equipamento[]>`
         SELECT e.id_cliente, e.id, e.id_familia, f.familia
@@ -63,7 +58,7 @@ export class IndicadorService {
           JOIN sofman_apontamento_paradas ap ON co.id = ap.id_ordem_servico
           WHERE co.id_equipamento IN (${Prisma.join(ids)}) 
           AND ap.data_hora_stop BETWEEN ${campos.startDate} AND ${campos.endDate}
-          ${campos.typeMaintenance.length ? Prisma.sql`AND co.tipo_manutencao IN (${Prisma.join(campos.typeMaintenance)})` : Prisma.empty}`,
+          ${campos.typeMaintenance?.length ? Prisma.sql`AND co.tipo_manutencao IN (${Prisma.join(campos.typeMaintenance)})` : Prisma.empty}`,
       ]);
 
       // 3. Agrupamento
@@ -85,20 +80,19 @@ export class IndicadorService {
 
         const tPrev = horarios
           .filter((h) => h.id_equipamento === eq.id)
-          .reduce(
-            (acc, h) =>
-              acc + (timeToMinutes(h.termino) - timeToMinutes(h.inicio)),
-            0,
-          );
+          .reduce((acc, h) => {
+            if (!h.inicio || !h.termino) return acc;
+            // Calcula a diferença exata em minutos entre o início e o fim
+            return acc + dayjs(h.termino).diff(dayjs(h.inicio), 'minute');
+          }, 0);
         const pEq = paradas.filter((p) => p.id_equipamento === eq.id);
-        const tMaint = pEq.reduce(
-          (acc, p) =>
+        const tMaint = pEq.reduce((acc, p) => {
+          if (!p.data_hora_start || !p.data_hora_stop) return acc;
+          return (
             acc +
-            (new Date(p.data_hora_start).getTime() -
-              new Date(p.data_hora_stop).getTime()) /
-              60000,
-          0,
-        );
+            dayjs(p.data_hora_start).diff(dayjs(p.data_hora_stop), 'minute')
+          );
+        }, 0);
 
         if (tPrev > 0) {
           agregacao.tempo_prev += tPrev;

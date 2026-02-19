@@ -25,11 +25,12 @@ export const ReadIndicatorSchema = z
 
     typeMaintenance: z
       .string()
-      .default('1')
-      .refine((val) => /^(\d+,)*\d+$/.test(val), {
-        message: 'Use apenas números separados por vírgula.',
+      .optional()
+      .refine((val) => val === undefined || /^(\d+,)*\d+$/.test(val), {
+        message:
+          'Use apenas números separados por vírgula nos tipos de manutenção.',
       })
-      .transform((val) => val.split(',').map(Number)),
+      .transform((val) => (val ? val.split(',').map(Number) : undefined)),
 
     id_cliente: z.coerce.number().optional().default(405),
   })
